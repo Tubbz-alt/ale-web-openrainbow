@@ -1,0 +1,37 @@
+{
+  "name": "rainbow",
+  "version": "0.0.1",
+  "description": "Lib para Rainbow",
+  "main": "index.js",
+  "scripts": {
+    "build-dev": "webpack --config webpack.config.js",
+    "build-prod": "cross-env NODE_ENV=production webpack --config webpack.config.js",
+    "watch": "webpack --watch",
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "rainbow",
+    "chat"
+  ],
+  "author": "Vitor Oliveira",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jquery": "^3.3.22",
+    "cross-env": "^5.2.0",
+    "express": "^4.16.4",
+    "morgan": "^1.9.1",
+    "open": "0.0.5",
+    "reload": "^2.3.1",
+    "ts-loader": "^5.3.1",
+    "typescript": "^3.2.1",
+    "webpack": "^4.26.1",
+    "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.5.0",
+    "bootbox": "^4.4.0",
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.3.1"
+  }
+}
