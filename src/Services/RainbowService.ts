@@ -132,29 +132,38 @@ export class RainbowService {
         //    this.signout();
         //}
 
+        if (this._listener != null)
+            this._listener.onReady();
+
     }
 
     /**
      * Callback for handling the event 'RAINBOW_ONCONNECTIONSTATECHANGED'
      */
     _onLoaded() {
-        console.log('[ServiceRainbow][_onLoaded] :: On SDK Loaded !');
+        this.logInfo('[ServiceRainbow][_onLoaded] :: On SDK Loaded !');
+        
         // Activate full SDK log
-        rainbowSDK.setVerboseLog(true);
+        rainbowSDK.setVerboseLog(this.verbose);
 
         rainbowSDK
-            .initialize(this._applicationID, this._applicationSecret)
-            .then(function () {
-                console.log('[ServiceRainbow][_onLoaded][rainbowSDK - initialize] :: Rainbow SDK is initialized!');
+            .initialize(this._appId, this._appSecret)
+            .then(() => {
+                this.logInfo('[ServiceRainbow][_onLoaded][rainbowSDK - initialize] :: Rainbow SDK is initialized!');
+                if (this._listener != null)
+                    this._listener.onLoaded();
             })
-            .catch(function (err) {
-                console.log('[ServiceRainbow][_onLoaded][rainbowSDK - initialize] :: Something went wrong with the SDK...');
+            .catch((err) => {
+                this.logInfo('[ServiceRainbow][_onLoaded][rainbowSDK - initialize] :: Something went wrong with the SDK...');
                 console.error('[ERROR] :: Something went wrong with the SDK...', err);
+                throw err;
             });
     }
 
-    _onSigned(event, account) {
-        console.log('[ServiceRainbow][_onSigned]', account);
+    _onSigned(event : Event, account : any) {
+        this.logInfo('[ServiceRainbow][_onSigned]', account);
+        if (this._listener != null)
+            this._listener.onSigned(event, account);
     }
 
     _onConnectionStateChangeEvent(event, status) {
