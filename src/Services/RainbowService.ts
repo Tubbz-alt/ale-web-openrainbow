@@ -43,72 +43,7 @@ export class RainbowService {
         // Subscribe to WebRTC call change
         $(document).on(rainbowSDK.webRTC.RAINBOW_ONWEBRTCCALLSTATECHANGED, this._onWebRTCCallChanged.bind(this));
 
-        $(document).on(rainbowSDK.webRTC.RAINBOW_ONWEBRTCERRORHANDLED, (__event, error) => {
-            console.error("[ServiceRainbow][rainbowSDK][RAINBOW_ONWEBRTCERRORHANDLED] - ", __event, error);
-        });
-        _onStarted(event, account) {
-            console.log('[ServiceRainbow][_onStarted]', account);
-        };
-
-        /**
-         * Callback for handling the event 'RAINBOW_ONREADY' 
-         */
-        _onReady() {
-            console.log('[ServiceRainbow][_onReady] :: On SDK Ready !');
-            this.isStarted = true;
-
-            let acesso = this._serviceDatabase.getAcesso();
-            if (acesso) {
-                this.signout();
-            }
-
-
-            this.login('user@vstelecom.com.br', '@Vstelecom2018');
-
-
-        }
-
-        /**
-         * Callback for handling the event 'RAINBOW_ONCONNECTIONSTATECHANGED'
-         */
-        _onLoaded() {
-            console.log('[ServiceRainbow][_onLoaded] :: On SDK Loaded !');
-            // Activate full SDK log
-            rainbowSDK.setVerboseLog(true);
-
-            rainbowSDK
-                .initialize(this._applicationID, this._applicationSecret)
-                .then(function () {
-                    console.log('[ServiceRainbow][_onLoaded][rainbowSDK - initialize] :: Rainbow SDK is initialized!');
-                })
-                .catch(function (err) {
-                    console.log('[ServiceRainbow][_onLoaded][rainbowSDK - initialize] :: Something went wrong with the SDK...');
-                    console.error('[ERROR] :: Something went wrong with the SDK...', err);
-                });
-        }
-
-        _onSigned(event, account) {
-            console.log('[ServiceRainbow][_onSigned]', account);
-        }
-
-        _onConnectionStateChangeEvent(event, status) {
-            switch (status) {
-                case rainbowSDK.connection.RAINBOW_CONNECTIONCONNECTED:
-                    // The state of the connection has changed to "connected" which means that your application is now connected to Rainbow
-                    console.log('[ServiceRainbow][_onConnectionStateChangeEvent][RAINBOW_CONNECTIONCONNECTED]');
-                    break;
-                case rainbowSDK.connection.RAINBOW_CONNECTIONINPROGRESS:
-                    // The state of the connection is now in progress which means that your application try to connect to Rainbow
-                    console.log('[ServiceRainbow][_onConnectionStateChangeEvent][RAINBOW_CONNECTIONINPROGRESS]');
-                    break;
-                case rainbowSDK.connection.RAINBOW_CONNECTIONDISCONNECTED:
-                    // The state of the connection changed to "disconnected" which means that your application is no more connected to Rainbow
-                    console.log('[ServiceRainbow][_onConnectionStateChangeEvent][RAINBOW_CONNECTIONDISCONNECTED]');
-                    break;
-                default:
-                    break;
-            };
-        }
+        $(document).on(rainbowSDK.webRTC.RAINBOW_ONWEBRTCERRORHANDLED, this._onWebRTCErrorHandled.bind(this));
     }
 
     _onStarted(event : Event, account : any) {
@@ -183,6 +118,14 @@ export class RainbowService {
             default:
                 break;
         };
+    }
+
+    _onWebRTCCallChanged() {
+        
+    }
+
+    _onWebRTCErrorHandled(event : Event, error : any){
+        console.error("[ServiceRainbow][rainbowSDK][RAINBOW_ONWEBRTCERRORHANDLED] - ", event, error);
     }
 
     logInfo(title: string, msg: any = undefined) {
