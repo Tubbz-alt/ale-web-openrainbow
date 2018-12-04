@@ -17,7 +17,9 @@
   "author": "Vitor Oliveira",
   "license": "MIT",
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.5.0",
     "@types/jquery": "^3.3.22",
+    "bootbox": "^4.4.0",
     "cross-env": "^5.2.0",
     "express": "^4.16.4",
     "morgan": "^1.9.1",
@@ -29,9 +31,7 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.5.0",
-    "bootbox": "^4.4.0",
-    "bootstrap": "^3.3.7",
-    "jquery": "^3.3.1"
+    "jquery": "^3.3.1",
+    "rainbow-web-sdk": "^1.49.0"
   }
 }

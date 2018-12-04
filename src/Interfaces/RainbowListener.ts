@@ -5,4 +5,6 @@ export interface RainbowListener {
     onStarted(event : Event, account : any) ;
     onConnectionStateChangeEvent();
     onWebRTCCallChanged();
+    onError(error);
+    onIncomming(call);
 }
