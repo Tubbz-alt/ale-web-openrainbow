@@ -24,6 +24,9 @@ export class RainbowService {
 
     private _listener: RainbowListener | null;
 
+    private _rainbowCurrentContact : any|null = null;
+    private _rainbowCurrentConversation : any| null = null;
+
     private _deviceAudioInputIdSelected : string| null = null;
     private _deviceAudioOutputIdSelected : string| null = null;
     private _deviceVideoInputIdSelected : string| null= null;
@@ -65,6 +68,9 @@ export class RainbowService {
 
         $(document).on(rainbowSDK.webRTC.RAINBOW_ONWEBRTCERRORHANDLED, this._onWebRTCErrorHandled.bind(this));
 
+        // Listen when the SDK is stopped
+        $(document).on(rainbowSDK.connection.RAINBOW_ONSTOPPED, this._onStopped.bind(this));
+
         /* Load the SDK */
         rainbowSDK.load();
 
@@ -95,6 +101,10 @@ export class RainbowService {
         if (this._listener != null)
             this._listener.onReady();
 
+    }
+
+    private _onStopped(event) {
+        // The SDK has been completely stopped.
     }
 
     /**
@@ -266,17 +276,117 @@ export class RainbowService {
     }
 
     public answerInVideo(call : any) {
-
+        rainbowSDK.webRTC.answerInVideo(call);
     }
 
     public releaseCall(call: any): any {
-        throw new Error('Method not implemented.');
+        /* Call this API to release the call */
+        let res = rainbowSDK.webRTC.release(call);
+        this.logInfo( res)
+    }
+
+    public getContatoById(contatoId) {
+        return rainbowSDK.contacts.getContactById(contatoId);
+    }
+
+    public searchContact(search : string) {
+        this.logInfo('[ServiceRainbow][pesquisaContato]', search);
+
+        if (!this.isLogged) {
+            throw new Error("User is not logged!");
+        }
+
+        let selectedContact = this.getContatoById(search)
+        let promiseSearchById : Promise<Array<any>>;
+        if (selectedContact) {
+            promiseSearchById = new Promise((resolve, reject) => {
+                resolve([selectedContact]);
+            })
+        } else {
+            promiseSearchById = rainbowSDK.contacts.searchById(search);
+        }
+
+        let promiseSearchByName : Promise<Array<any>> = rainbowSDK.contacts.searchByName(search)
+
+        return (
+            Promise.all([promiseSearchById, promiseSearchByName])
+            .then((searchs : any[]) => {
+                let searchUsers : any[] = [].concat(searchs[0],searchs[1]);
+                return searchUsers;
+            })
+        );
+
+    }
+
+    public cachedContacts() {
+        return rainbowSDK.contacts.getAll();
+    }
+
+    public openConversation(contact : any) : Promise<any> {
+        return rainbowSDK.conversations.openConversationForContact(contact)
+                .then((conversation) => {
+                    this._rainbowCurrentContact = contact;
+                    this._rainbowCurrentConversation = conversation
+                    return conversation;
+                })
+    }
+
+    /**
+     * Call a contact througth rainbow
+     * @param contact Object of contact from rainbow
+     */
+    public callAContact(contact : any) {
+
+        this.logInfo("[ServiceRainbow][callAContact]", contact);
+        return new Promise((resolve, reject) => {
+            let res = rainbowSDK.webRTC.callInVideo(contact);
+            this.logInfo("[ServiceRainbow][callAContact][rainbowSDK.webRTC.callInVideo]", res);
+            if(res.code === rainbowSDK.OK) {
+                /* Your call has been correctly initiated. Waiting for the other peer to answer */
+                resolve(res);   
+            } else {
+                reject(res);
+            }
+        });
+    }
+
+    public sendMessageToConversation(conversation : any,msg : string) {
+        rainbowSDK.im.sendMessageToConversation(conversation, msg);
+    }
+
+    public sendFileToConvesation(conversation : any, file : File, msg : string|any = undefined) {
+        if (msg == undefined) {
+            msg = null;
+        }
+        rainbowSDK.fileStorage.uploadFileToConversation(conversation, file, msg);
+    }
+
+    public getUserQuotaConsumption() {
+        return rainbowSDK.fileStorage.getUserQuotaConsumption();
+    }
+
+    public removeFile(shortFileDescriptor) {
+        return rainbowSDK.fileStorage.removeFile(shortFileDescriptor);
+    }
+
+    public getAllFilesSent() {
+        return rainbowSDK.fileStorage.getAllFilesSent();
     }
 
 
-    public logInfo(title: string, msg: any = undefined) {
+    public logInfo(title: string|any, msg: any = undefined) {
 
         if (!this.verbose) {
+            return;
+        }
+
+        if (typeof title !== "string" && msg) {
+            console.info("[RainbowService][logInfo]", title, msg);
+            return;
+        }
+
+        if (typeof title !== "string" && msg == undefined) {
+            console.info("[RainbowService][logInfo]", title);
             return;
         }
 
@@ -285,6 +395,7 @@ export class RainbowService {
             console.info(msgExibir);
             return;
         }
+
         if (is_scalar(msg)) {
             msgExibir = `${msgExibir} - ${msg}`;
             console.info(msgExibir);
