@@ -1,2 +1,4 @@
 # ale-web-openrainbow
-An JS Lib for Alcatel Open Rainbow
+A JS Lib for Alcatel Open Rainbow
+
+# DEPRECATED
